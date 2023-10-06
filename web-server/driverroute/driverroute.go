@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/benjamonnguyen/guber-ridershare-simulator/model/coord"
 	"github.com/benjamonnguyen/guber-ridershare-simulator/model/drivermodel"
 	"github.com/julienschmidt/httprouter"
 )
@@ -21,10 +20,10 @@ var DummyCollection = map[string]*drivermodel.Driver{
 }
 
 // TODO dummyLocationStream
-func dummyLocationStream(ctx context.Context) <-chan coord.Coord {
-	stream := make(chan coord.Coord, 5)
+func dummyLocationStream(ctx context.Context) <-chan [2]int {
+	stream := make(chan [2]int, 5)
 
-	go func(ch chan<- coord.Coord) {
+	go func(ch chan<- [2]int) {
 		defer close(stream)
 		t := time.NewTicker(time.Second * 5)
 		defer t.Stop()
@@ -34,7 +33,7 @@ func dummyLocationStream(ctx context.Context) <-chan coord.Coord {
 			case <-ctx.Done():
 				return
 			case <-t.C:
-				ch <- coord.Coord{X: 0, Y: 0}
+				ch <- [2]int{0, 0}
 			}
 		}
 	}(stream)
