@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/benjamonnguyen/guber-ridershare-simulator/model/passenger"
+	"github.com/benjamonnguyen/guber-ridershare-simulator/model/passengermodel"
 	"github.com/julienschmidt/httprouter"
 )
 
-var dummyCollection = map[string]*passenger.Passenger{
+var DummyCollection = map[string]*passengermodel.Passenger{
 	"1": {
 		ID:   "1",
 		Name: "Jesse",
@@ -16,7 +16,7 @@ var dummyCollection = map[string]*passenger.Passenger{
 }
 
 func GetPassenger(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	passenger, ok := dummyCollection[ps.ByName("id")]
+	passenger, ok := DummyCollection[ps.ByName("id")]
 	if !ok {
 		http.Error(w, "", http.StatusNotFound)
 		return

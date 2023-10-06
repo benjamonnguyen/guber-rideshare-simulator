@@ -7,6 +7,7 @@ import (
 
 	"github.com/benjamonnguyen/guber-ridershare-simulator/web-server/driverroute"
 	"github.com/benjamonnguyen/guber-ridershare-simulator/web-server/passengerroute"
+	"github.com/benjamonnguyen/guber-ridershare-simulator/web-server/rideroute"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -25,6 +26,14 @@ func main() {
 	// Passenger routes
 	router.GET("/passenger/:id", passengerroute.GetPassenger)
 	router.GET("/passenger/:id/location", driverroute.StreamLocation) // TODO using same dummy stream
+
+	// Ride routes
+	router.GET("/ride/:id", rideroute.GetRide)
+	router.POST("/ride", rideroute.CreateRide)
+	router.PUT("/ride/:id/accept", rideroute.Accept)
+	router.PUT("/ride/:id/reject", rideroute.Reject)
+	router.PUT("/ride/:id/cancel", rideroute.Cancel)
+	router.PUT("/ride/:id/complete", rideroute.Complete)
 
 	log.Fatal(http.ListenAndServe(*addr, router))
 }

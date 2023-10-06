@@ -8,15 +8,15 @@ import (
 	"time"
 
 	"github.com/benjamonnguyen/guber-ridershare-simulator/model/coord"
-	"github.com/benjamonnguyen/guber-ridershare-simulator/model/driver"
+	"github.com/benjamonnguyen/guber-ridershare-simulator/model/drivermodel"
 	"github.com/julienschmidt/httprouter"
 )
 
-var dummyCollection = map[string]*driver.Driver{
+var DummyCollection = map[string]*drivermodel.Driver{
 	"1": {
 		ID:     "1",
 		Name:   "Mike",
-		Status: driver.OFFLINE,
+		Status: drivermodel.StatusInactive,
 	},
 }
 
@@ -43,7 +43,7 @@ func dummyLocationStream(ctx context.Context) <-chan coord.Coord {
 }
 
 func GetDriver(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	driver, ok := dummyCollection[ps.ByName("id")]
+	driver, ok := DummyCollection[ps.ByName("id")]
 	if !ok {
 		http.Error(w, "", http.StatusNotFound)
 		return
@@ -89,12 +89,12 @@ func StreamLocation(w http.ResponseWriter, r *http.Request, ps httprouter.Params
 }
 
 func EndSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	d, ok := dummyCollection[ps.ByName("id")]
+	d, ok := DummyCollection[ps.ByName("id")]
 	if !ok {
 		http.Error(w, "", http.StatusNotFound)
 		return
 	}
-	d.Status = driver.OFFLINE
+	d.Status = drivermodel.StatusInactive
 
 	json, err := json.Marshal(d)
 	if err != nil {
@@ -111,12 +111,12 @@ func EndSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 }
 
 func StartSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	d, ok := dummyCollection[ps.ByName("id")]
+	d, ok := DummyCollection[ps.ByName("id")]
 	if !ok {
 		http.Error(w, "", http.StatusNotFound)
 		return
 	}
-	d.Status = driver.ACTIVE
+	d.Status = drivermodel.StatusActive
 
 	json, err := json.Marshal(d)
 	if err != nil {
