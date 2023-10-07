@@ -115,6 +115,8 @@ func Accept(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	ride.DriverID = driver.ID
 
 	// TODO async call to Dispatcher
+
+	w.WriteHeader(http.StatusOK)
 }
 
 func Reject(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -139,6 +141,8 @@ func Reject(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	driver.Status = drivermodel.StatusActive
 
 	// async call to Dispatcher
+
+	w.WriteHeader(http.StatusOK)
 }
 
 func Cancel(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -158,6 +162,8 @@ func Cancel(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	passenger.Status = passengermodel.StatusInactive
 
 	// TODO async call to Dispatcher to notify and update Driver
+
+	w.WriteHeader(http.StatusOK)
 }
 
 func Complete(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -179,6 +185,8 @@ func Complete(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	driver.Status = drivermodel.StatusActive
 
 	// TODO async call to Dispatcher to credit/debit driver/passenger
+
+	w.WriteHeader(http.StatusOK)
 }
 
 func validateUpdateRequest(r *http.Request, ps httprouter.Params) (passenger *passengermodel.Passenger, ride *ridemodel.Ride, statusCode int, err error) {
