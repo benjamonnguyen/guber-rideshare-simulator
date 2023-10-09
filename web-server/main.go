@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -9,12 +10,14 @@ import (
 	"github.com/benjamonnguyen/guber-ridershare-simulator/web-server/passengerroute"
 	"github.com/benjamonnguyen/guber-ridershare-simulator/web-server/rideroute"
 	"github.com/julienschmidt/httprouter"
+	"github.com/urfave/negroni"
 )
 
 func main() {
-	var addr = flag.String("addr", "localhost:8080", "http service address")
+	const appName = "web-server"
+
+	addr := flag.String("addr", "localhost:8080", "http service address")
 	flag.Parse()
-	log.Println("starting web-server on", *addr)
 
 	router := httprouter.New()
 	// Driver routes
@@ -35,5 +38,10 @@ func main() {
 	router.PUT("/ride/:id/cancel", rideroute.Cancel)
 	router.PUT("/ride/:id/complete", rideroute.Complete)
 
-	log.Fatal(http.ListenAndServe(*addr, router))
+	n := negroni.Classic()
+	n.UseHandler(router)
+
+	log.SetPrefix(fmt.Sprintf("[%s] ", appName))
+	log.Printf("started %s on %s\n", appName, *addr)
+	log.Fatal(http.ListenAndServe(*addr, n))
 }

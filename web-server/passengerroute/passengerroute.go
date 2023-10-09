@@ -9,8 +9,8 @@ import (
 )
 
 var DummyCollection = map[string]*passengermodel.Passenger{
-	"1": {
-		ID:   "1",
+	"2": {
+		ID:   "2",
 		Name: "Jesse",
 	},
 }

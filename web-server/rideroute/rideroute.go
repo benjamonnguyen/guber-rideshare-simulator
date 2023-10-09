@@ -7,7 +7,6 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/benjamonnguyen/guber-ridershare-simulator/model/coord"
 	"github.com/benjamonnguyen/guber-ridershare-simulator/model/drivermodel"
 	"github.com/benjamonnguyen/guber-ridershare-simulator/model/passengermodel"
 	"github.com/benjamonnguyen/guber-ridershare-simulator/model/ridemodel"
@@ -22,10 +21,10 @@ var dummyCollection = map[string]*ridemodel.Ride{
 		PassengerID: "1",
 		DriverID:    "1",
 		Status:      ridemodel.StatusComplete,
-		Pickup:      coord.Coord{X: 0, Y: 0},
-		Dropoff:     coord.Coord{X: 0, Y: 0},
-		PickupPath:  []coord.Coord{{X: 0, Y: 0}},
-		DropoffPath: []coord.Coord{{X: 0, Y: 0}},
+		Pickup:      [2]int{0, 0},
+		Dropoff:     [2]int{0, 0},
+		PickupPath:  [][2]int{{0, 0}},
+		DropoffPath: [][2]int{{0, 0}},
 	},
 }
 
@@ -57,6 +56,7 @@ func CreateRide(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		http.Error(w, "", http.StatusBadRequest)
 		return
 	}
+	defer r.Body.Close()
 
 	passenger, ok := passengerroute.DummyCollection[rideRequest.PassengerID]
 	if !ok {
@@ -115,6 +115,8 @@ func Accept(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	ride.DriverID = driver.ID
 
 	// TODO async call to Dispatcher
+
+	w.WriteHeader(http.StatusOK)
 }
 
 func Reject(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -139,6 +141,8 @@ func Reject(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	driver.Status = drivermodel.StatusActive
 
 	// async call to Dispatcher
+
+	w.WriteHeader(http.StatusOK)
 }
 
 func Cancel(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -158,6 +162,8 @@ func Cancel(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	passenger.Status = passengermodel.StatusInactive
 
 	// TODO async call to Dispatcher to notify and update Driver
+
+	w.WriteHeader(http.StatusOK)
 }
 
 func Complete(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -179,6 +185,8 @@ func Complete(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	driver.Status = drivermodel.StatusActive
 
 	// TODO async call to Dispatcher to credit/debit driver/passenger
+
+	w.WriteHeader(http.StatusOK)
 }
 
 func validateUpdateRequest(r *http.Request, ps httprouter.Params) (passenger *passengermodel.Passenger, ride *ridemodel.Ride, statusCode int, err error) {
@@ -201,6 +209,7 @@ func validateUpdateRequest(r *http.Request, ps httprouter.Params) (passenger *pa
 
 func getDriverIdFromBody(body io.ReadCloser) (driverId string, statusCode int, err error) {
 	driverIdData, err := io.ReadAll(body)
+	defer body.Close()
 	if err != nil {
 		return "", http.StatusInternalServerError, errors.New("")
 	}
