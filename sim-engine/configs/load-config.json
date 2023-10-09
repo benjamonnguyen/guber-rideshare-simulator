@@ -1,0 +1,7 @@
+{
+    "rideRequestRateMs": 1000,
+    "maxRides": 9999,
+    "cancelPct": 0,
+    "rejectPct": 0,
+    "locationUpdateRateMs": 1000
+}
