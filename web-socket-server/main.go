@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -15,7 +16,9 @@ import (
 )
 
 func main() {
-	var addr = flag.String("addr", "localhost:8081", "http service address")
+	const appName = "web-socket-server"
+
+	addr := flag.String("addr", "localhost:8081", "http service address")
 	flag.Parse()
 
 	router := httprouter.New()
@@ -25,7 +28,8 @@ func main() {
 	n := negroni.Classic()
 	n.UseHandler(router)
 
-	log.Println("started web-socket-server on", *addr)
+	log.SetPrefix(fmt.Sprintf("[%s] ", appName))
+	log.Printf("started %s on %s\n", appName, *addr)
 	log.Fatal(http.ListenAndServe(*addr, n))
 }
 

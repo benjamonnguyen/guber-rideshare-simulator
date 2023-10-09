@@ -37,6 +37,10 @@ func Connect(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 		for {
 			msgType, msg, err := c.ReadMessage()
 			if err != nil {
+				if websocket.IsUnexpectedCloseError(err) {
+					delete(clientregistry.ClientRegistry, clientId)
+					log.Printf("remove client %s from registry\n", clientId)
+				}
 				log.Println("read:", err)
 				break
 			}
