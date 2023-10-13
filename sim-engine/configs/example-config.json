@@ -1,0 +1,9 @@
+{
+    "rideRequestRateMs": 5000,
+    "maxRides": 100,
+    "driverCnt": 50,
+    "cancelPct": 10,
+    "rejectPct": 20,
+    "decisionSpeedMs": 15000,
+    "locationUpdateRateMs": 5000
+}
