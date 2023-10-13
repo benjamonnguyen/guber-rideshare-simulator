@@ -4,19 +4,22 @@ import (
 	"testing"
 )
 
-func TestGetConfigWithNoConfigPath(t *testing.T) {
-	conf := GetConfig("")
+func TestLoadConfigWithNoConfigPath(t *testing.T) {
+	conf := LoadConfig("")
 
-	if conf.MaxRides != DefaultMaxRides {
-		t.Errorf("maxRides incorrect, got: %d, want: %d", conf.MaxRides, DefaultMaxRides)
+	if conf.WebSocketServerAddr != defaultWebSocketServerAddr {
+		t.Errorf("webSocketServerAddr incorrect, got: %s, want: %s", conf.WebSocketServerAddr, defaultWebSocketServerAddr)
 	}
-	if conf.LocationUpdateRateMs != DefaultLocationUpdateRateMs {
-		t.Errorf("locationUpdateRateMs incorrect, got: %d, want: %d", conf.LocationUpdateRateMs, DefaultLocationUpdateRateMs)
+	if conf.MaxRides != defaultMaxRides {
+		t.Errorf("maxRides incorrect, got: %d, want: %d", conf.MaxRides, defaultMaxRides)
+	}
+	if conf.LocationUpdateRateMs != defaultLocationUpdateRateMs {
+		t.Errorf("locationUpdateRateMs incorrect, got: %d, want: %d", conf.LocationUpdateRateMs, defaultLocationUpdateRateMs)
 	}
 }
 
-func TestGetConfigWithExampleConfigPath(t *testing.T) {
-	conf := GetConfig("example-config.json")
+func TestLoadConfigWithExampleConfigPath(t *testing.T) {
+	conf := LoadConfig("example-config.json")
 
 	got := conf.RideRequestRateMs
 	want := 5000

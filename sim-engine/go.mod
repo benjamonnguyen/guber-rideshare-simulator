@@ -2,7 +2,10 @@ module github.com/benjamonnguyen/guber-rideshare-simulator/sim-engine
 
 go 1.21.1
 
-require github.com/go-playground/validator/v10 v10.15.5
+require (
+	github.com/go-playground/validator/v10 v10.15.5
+	github.com/gorilla/websocket v1.4.2
+)
 
 require (
 	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
