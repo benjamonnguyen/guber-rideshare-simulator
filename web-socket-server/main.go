@@ -6,23 +6,30 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"sync"
+	"syscall"
+	"time"
 
 	"github.com/benjamonnguyen/guber-ridershare-simulator/model/msgmodel"
 	"github.com/benjamonnguyen/guber-rideshare-simulator/web-socket-server/clientregistry"
-	"github.com/benjamonnguyen/guber-rideshare-simulator/web-socket-server/connectroute"
+	"github.com/benjamonnguyen/guber-rideshare-simulator/web-socket-server/route"
 	"github.com/gorilla/websocket"
 	"github.com/julienschmidt/httprouter"
 	"github.com/urfave/negroni"
 )
 
-func main() {
-	const appName = "web-socket-server"
+const appName = "web-socket-server"
 
-	addr := flag.String("addr", "localhost:8081", "http service address")
+var addr = flag.String("addr", "localhost:8081", "http service address")
+
+func main() {
+	go handleGraceShutdown()
 	flag.Parse()
 
 	router := httprouter.New()
-	router.GET("/connect/:clientId", connectroute.Connect)
+	router.GET("/connect/:clientId", route.Connect)
 	router.POST("/msg", msgClient)
 
 	n := negroni.Classic()
@@ -53,4 +60,34 @@ func msgClient(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	}
 
 	w.WriteHeader(http.StatusOK)
+}
+
+func handleGraceShutdown() {
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+	<-sigs
+	log.Println("graceful shutdown started")
+	done := make(chan struct{}, 1)
+	var wg sync.WaitGroup
+	for id, conn := range clientregistry.ClientRegistry {
+		id := id
+		conn := conn
+		wg.Add(1)
+		go func() {
+			conn.WriteControl(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""), time.Now().Add(time.Second*2))
+			log.Println("sent closeMessage to client", id)
+			wg.Done()
+		}()
+	}
+	go func() {
+		wg.Wait()
+		close(done)
+	}()
+	select {
+	case <-time.After(time.Second * 5):
+		log.Println("graceful shutdown timeout")
+	case <-done:
+		log.Println("graceful shutdown complete")
+	}
+	os.Exit(0)
 }
